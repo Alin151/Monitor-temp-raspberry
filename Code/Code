@@ -62,9 +62,17 @@ def read_temp_c2():
 
 ledMode( 12, GPIO.HIGH )
 
+
+#def setup():
+   # attach.process(myProcess)
+
+#tempRPI = int(open('/sys/class/thermal/thermal_zone0/temp').read()) / 1e3
+temp_ci = float(read_temp_c1())
+temp_co = float(read_temp_c2())
+
 while True:
-   temp_ci = float(read_temp_c1())
-   temp_co = float(read_temp_c2())
+   #temp_ci = float(read_temp_c1())
+   #temp_co = float(read_temp_c2())
    if temp_ci<6:
     ledMode( 12, GPIO.LOW)
    else:
@@ -90,19 +98,27 @@ while True:
    lcd.write_string (read_temp_c2() + " C  ") 
    Interior = float(read_temp_c1())
    Exterior = float(read_temp_c2())
+   # Prepare the Emoncms
    json2 = "{TempIn:" + "%.2f"%Interior
-   json1 = "{TempOut:" + "%.2f"%Exterior
-   # Prepare the URL 
+   json1 = "{TempOut:" + "%.2f"%Exterior 
    url  ="http://" + "emoncms.org" + "/" +  "input/post.json?node=0&apikey=" + emonApiKey + "&json=" + urllib2.quote(json1)
    urllib2.urlopen(url)
    url  ="http://" + "emoncms.org" + "/" +  "input/post.json?node=0&apikey=" + emonApiKey + "&json=" + urllib2.quote(json2)
    urllib2.urlopen(url)
+   # Prepare the Thingspeak
    params = urllib.urlencode({'field1': temp_ci,'field2': temp_co, 'key':'E8VWW4LG7ZF5Y52F'})
    headers = {"Content-type": "application/x-www-form-urlencoded","Accept":   "text/plain"}
    conn = httplib.HTTPConnection("api.thingspeak.com:80")
-   conn.request("POST", "/update", params, headers)
-   response = conn.getresponse()  
-   data = response.read()
+   try:
+      conn.request("POST", "/update", params, headers)
+      response = conn.getresponse()  
+      data = response.read()
+      print response.status, response.reason
+      data = response.read()
+      conn.close()
+   except:
+      print "connection failed"
+      break
    #print(data,response)
-   conn.close()
-  # time.sleep(1)
+  # conn.close()
+   time.sleep(6)
