@@ -121,4 +121,4 @@ while True:
       break
    #print(data,response)
   # conn.close()
-   time.sleep(6)
+   time.sleep(60)
