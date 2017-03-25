@@ -62,13 +62,6 @@ def read_temp_c2():
 
 ledMode( 12, GPIO.HIGH )
 
-
-def setup():
-    attach.process(myProcess)
-
-#tempRPI = int(open('/sys/class/thermal/thermal_zone0/temp').read()) / 1e3
-
-
 while True:
    temp_ci = float(read_temp_c1())
    temp_co = float(read_temp_c2())
@@ -112,4 +105,4 @@ while True:
    data = response.read()
    #print(data,response)
    conn.close()
-   time.sleep(1)
+  # time.sleep(1)
